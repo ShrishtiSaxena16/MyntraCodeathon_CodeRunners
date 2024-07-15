@@ -1,0 +1,203 @@
+Step 1: Set Up the Project Directory
+mkdir myntra-locality-feature
+cd myntra-locality-feature
+
+Step 2: Set Up Backend with Spring Boot
+Generate a Spring Boot project
+
+Create a model class for the item:
+
+package com.example.demo.model;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+public class Item {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String itemId;
+    private String locality;
+    private int inCart;
+    private int purchased;
+
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getItemId() {
+        return itemId;
+    }
+public void setItemId(String itemId) {
+        this.itemId = itemId;
+    }
+
+    public String getLocality() {
+        return locality;
+    }
+
+    public void setLocality(String locality) {
+        this.locality = locality;
+    }
+
+    public int getInCart() {
+        return inCart;
+    }
+
+    public void setInCart(int inCart) {
+        this.inCart = inCart;
+    }
+
+    public int getPurchased() {
+        return purchased;
+    }
+
+    public void setPurchased(int purchased) {
+        this.purchased = purchased;
+    }
+}
+
+Create a repository interface:
+
+package com.example.demo.repository;
+import com.example.demo.model.Item;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
+
+public interface ItemRepository extends JpaRepository<Item, Long> {
+    Optional<Item> findByItemIdAndLocality(String itemId, String locality);
+}
+Create a controller:
+
+Create a java file:
+
+package com.example.demo.controller;
+import com.example.demo.model.Item;
+import com.example.demo.repository.ItemRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/items")
+public class ItemController {
+
+    @Autowired
+    private ItemRepository itemRepository;
+
+    @GetMapping("/{itemId}/locality/{locality}")
+    public Item getItem(@PathVariable String itemId, @PathVariable String locality) {
+        return itemRepository.findByItemIdAndLocality(itemId, locality)
+                .orElse(new Item());
+ }
+
+    @PostMapping
+    public Item addItem(@RequestBody Item item) {
+        return itemRepository.save(item);
+    }
+}
+Run the Spring Boot application:
+
+package com.example.demo;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+Configure H2 Database:
+
+Create a properties file:
+
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=password
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.h2.console.enabled=true
+
+Step 3: Frontend Development with React
+Navigate to the project root directory:
+
+Create a new React app:
+
+Install Axios for API calls:
+
+Create a component to display locality info:
+
+Create a javascript file:
+
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+const LocalityInfo = ({ itemId, locality }) => {
+const [info, setInfo] = useState({ inCart: 0, purchased: 0 });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await axios.get(http://localhost:8080/api/items/${itemId}/locality/${locality});
+      setInfo(response.data);
+    };
+    fetchData();
+  }, [itemId, locality]);
+
+  return (
+    <div>
+      <h2>Locality Information</h2>
+      <p>{info.inCart} people in your area have this item in their cart.</p>
+      <p>{info.purchased} people in your area have purchased this item.</p>
+    </div>
+  );
+};
+
+export default LocalityInfo;
+
+Integrate the component in the App:
+
+Modify src/App.js:
+javascript
+Copy code
+import React from 'react';
+import './App.css';
+import LocalityInfo from './LocalityInfo';
+
+function App() {
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1>Welcome to Myntra</h1>
+        <LocalityInfo itemId="12345" locality="Bangalore" />
+      </header>
+    </div>
+ );
+}
+
+export default App;
+
+Run the frontend:
+
+Step 4: Testing the Prototype
+Add Sample Data:
+
+Use Postman or a similar tool to POST sample data to your backend:
+json
+{
+  "itemId": "12345",
+  "locality": "Bangalore",
+  "inCart": 5,
+  "purchased": 3
+}
+
+

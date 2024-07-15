@@ -1,0 +1,187 @@
+Step 1  Creat a HTML file named index.html:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gender-Neutral Fashion</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Gender-Neutral Fashion</h1>
+        <nav>
+            <ul>
+                <li><a href="#collections">Collections</a></li>
+                <li><a href="#designers">Designers</a></li>
+                <li><a href="#influencers">Influencers</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section id="collections">
+        <h2>Exclusive Collections</h2>
+        <div id="products">
+            <!-- Products will be dynamically inserted here -->
+        </div>
+    </section>
+    <section id="designers">
+        <h2>Our Designers</h2>
+        <div id="designer-list">
+            <!-- Designer profiles will be dynamically inserted here -->
+        </div>
+    </section>
+    <section id="influencers">
+        <h2>Featured Influencers</h2>
+        <div id="influencer-list">
+            <!-- Influencer profiles will be dynamically inserted here -->
+        </div>
+    </section>
+    <script src="app.js"></script>
+</body>
+</html>
+
+Step 2  Creat a CSS file named styles.css:
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 1rem;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+section {
+    padding: 2rem;
+    background-color: #fff;
+    margin: 1rem;
+    border-radius: 5px;
+}
+
+h2 {
+    color: #333;
+}
+
+#products, #designer-list, #influencer-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.product, .designer, .influencer {
+    background-color: #e2e2e2;
+    padding: 1rem;
+    border-radius: 5px;
+    width: calc(33.333% - 2rem);
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .product, .designer, .influencer {
+        width: calc(50% - 2rem);
+    }
+}
+
+@media (max-width: 480px) {
+    .product, .designer, .influencer {
+        width: 100%;
+    }
+}
+
+Step 3  Create an app.js file:
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("JavaScript is running");
+    fetch('/api/products')
+        .then(response => response.json())
+        .then(products => {
+            const productContainer = document.getElementById('products');
+            products.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.classList.add('product');
+                productElement.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>${product.price}</p>
+                `;
+                productContainer.appendChild(productElement);
+            });
+        });
+
+    // Fetch and render designers
+    fetch('/api/designers')
+        .then(response => response.json())
+        .then(designers => {
+            const designerContainer = document.getElementById('designer-list');
+            designers.forEach(designer => {
+                const designerElement = document.createElement('div');
+                designerElement.classList.add('designer');
+                designerElement.innerHTML = `
+                    <img src="${designer.image}" alt="${designer.name}">
+                    <h3>${designer.name}</h3>
+                    <p>${designer.bio}</p>
+                `;
+                designerContainer.appendChild(designerElement);
+            });
+        });
+
+    // Fetch and render influencers
+    fetch('/api/influencers')
+        .then(response => response.json())
+        .then(influencers => {
+            const influencerContainer = document.getElementById('influencer-list');
+            influencers.forEach(influencer => {
+                const influencerElement = document.createElement('div');
+                influencerElement.classList.add('influencer');
+                influencerElement.innerHTML = `
+                    <img src="${influencer.image}" alt="${influencer.name}">
+                    <h3>${influencer.name}</h3>
+                    <p>${influencer.bio}</p>
+                `;
+                influencerContainer.appendChild(influencerElement);
+            });
+        });
+});
+
+Step 4  Create a server.js file:
+const express = require('express');
+const cors = require('cors');
+const products = require('./data/products');
+
+const app = express();
+const port = 5000;
+
+app.use(cors());
+
+app.get('/api/products', (req, res) => {
+    res.json(products);
+});
+
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});
+
+
+
+
+
+
